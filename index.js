@@ -35,6 +35,7 @@ app.post('/tareas', (req, res) => {
   const { descripcion, conversationID } = req.body;
 
   if (!descripcion || !conversationID) {
+    console.error(`400 - Fallo al crear la tarea: ${req.body}`);
     return res.status(400).json({ error: 'La descripción y el conversationID son requeridos' });
   }
 
@@ -55,6 +56,7 @@ app.put('/tareas/:numero_tarea', (req, res) => {
   const { descripcion } = req.body;
 
   if (!descripcion) {
+    console.error(`400 - Fallo al actualizar la tarea: ${req.body} --- ${req.params}`);
     return res.status(400).json({ error: 'La descripción es requerida' });
   }
 
