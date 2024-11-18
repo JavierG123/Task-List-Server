@@ -41,7 +41,7 @@ app.post('/tareas', (req, res) => {
   const query = `INSERT INTO tareas (descripcion, conversationID) VALUES (?, ?)`;
   db.run(query, [descripcion, conversationID], function (err) {
     if (err) {
-      console.log(`Fallo al crear la tarea: ${JSON.stringify(err,2,null)}`);
+      console.log(`Fallo al crear la tarea: ${JSON.stringify(err,null,2)}`);
       return res.status(500).json({ error: 'Error al crear la tarea' });
     }
 
@@ -61,6 +61,7 @@ app.put('/tareas/:numero_tarea', (req, res) => {
   const query = `UPDATE tareas SET descripcion = ? WHERE numero_tarea = ?`;
   db.run(query, [descripcion, numero_tarea], function (err) {
     if (err) {
+      console.log(`Fallo al crear la tarea: ${JSON.stringify(err,null,2)}`);
       return res.status(500).json({ error: 'Error al actualizar la tarea' });
     }
 
