@@ -41,6 +41,7 @@ app.post('/tareas', (req, res) => {
   const query = `INSERT INTO tareas (descripcion, conversationID) VALUES (?, ?)`;
   db.run(query, [descripcion, conversationID], function (err) {
     if (err) {
+      console.log(`Fallo al crear la tarea: ${JSON.stringify(err,2,null)}`);
       return res.status(500).json({ error: 'Error al crear la tarea' });
     }
 
