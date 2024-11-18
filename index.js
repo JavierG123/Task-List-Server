@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 // Base de datos SQLite
-const db = new sqlite3.Database(':memory:');
+const db = new sqlite3.Database(':memory.sqlite:');
 
 // Crear/recrear tabla "tareas"
 db.serialize(() => {

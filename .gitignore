@@ -130,4 +130,4 @@ dist
 .pnp.*
 
 # SQlite3
-memory
+*.sqlite
