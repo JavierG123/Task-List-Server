@@ -87,6 +87,22 @@ app.get('/tareas', (req, res) => {
   });
 });
 
+// Endpoint para buscar un ticket (tarea) por numero_tarea
+app.get('/tareas/:numero_tarea', (req, res) => {
+  const { numero_tarea } = req.params;
+
+  const query = `SELECT 1 FROM tareas WHERE numero_tarea = ?`;
+  db.get(query, [numero_tarea], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al buscar el ticket' });
+    }
+
+    // Si la tarea existe, devolver true; de lo contrario, false
+    res.status(200).json({ exists: !!row });
+  });
+});
+
+
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`Servicio escuchando en http://localhost:${port}`);
