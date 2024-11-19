@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
-const { unescape } = require('html-escaper');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -64,7 +63,7 @@ app.put('/tareas/:numero_tarea', (req, res) => {
   const query = `UPDATE tareas SET descripcion = ? WHERE numero_tarea = ?`;
   db.run(query, [descripcion, numero_tarea], function (err) {
     if (err) {
-      console.error(`Fallo al crear la tarea: ${JSON.stringify(err, null, 2)}`);
+      console.error(`Fallo al actualizar la tarea: ${JSON.stringify(err, null, 2)}`);
       return res.status(500).json({ error: 'Error al actualizar la tarea' });
     }
 
@@ -84,13 +83,7 @@ app.get('/tareas', (req, res) => {
       return res.status(500).json({ error: 'Error al obtener las tareas' });
     }
 
-    // Renderizar las descripciones como HTML
-    const renderedRows = rows.map(row => ({
-      ...row,
-      descripcion: `<div>${unescape(row.descripcion)}</div>`,
-    }));
-
-    res.status(200).json(renderedRows);
+    res.status(200).json(rows);
   });
 });
 
@@ -107,9 +100,6 @@ app.get('/tareas/:numero_tarea', (req, res) => {
     if (!row) {
       return res.status(404).json({ error: 'Tarea no encontrada' });
     }
-
-    // Renderizar la descripción como HTML
-    row.descripcion = `<div>${unescape(row.descripcion)}</div>`;
 
     res.status(200).json(row);
   });
