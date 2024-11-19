@@ -8,6 +8,9 @@ const port = process.env.PORT || 3000;
 // Middleware para parsear JSON
 app.use(bodyParser.json());
 
+// Configurar EJS como motor de vistas
+app.set('view engine', 'ejs');
+
 // Base de datos SQLite
 const db = new sqlite3.Database(':memory.sqlite:');
 
@@ -102,6 +105,40 @@ app.get('/tareas/:numero_tarea', (req, res) => {
     }
 
     res.status(200).json(row);
+  });
+});
+
+
+// Nuevo endpoint para renderizar descripción como HTML
+app.get('/tareas/:numero_tarea/desc', (req, res) => {
+  const { numero_tarea } = req.params;
+
+  const query = `SELECT descripcion FROM tareas WHERE numero_tarea = ?`;
+  db.get(query, [numero_tarea], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al buscar la tarea' });
+    }
+
+    if (!row) {
+      return res.status(404).json({ error: 'Tarea no encontrada' });
+    }
+
+    const descripcionHTML = row.descripcion;
+
+    // Enviar el HTML como respuesta renderizada
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tarea Renderizada</title>
+      </head>
+      <body>
+        ${descripcionHTML}
+      </body>
+      </html>
+    `);
   });
 });
 
