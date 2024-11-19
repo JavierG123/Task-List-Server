@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
+const { unescape } = require('html-escaper');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -75,7 +76,6 @@ app.put('/tareas/:numero_tarea', (req, res) => {
   });
 });
 
-// Endpoint para listar todas las tareas (GET)
 app.get('/tareas', (req, res) => {
   const query = `SELECT * FROM tareas`;
   db.all(query, [], (err, rows) => {
@@ -83,22 +83,33 @@ app.get('/tareas', (req, res) => {
       return res.status(500).json({ error: 'Error al obtener las tareas' });
     }
 
-    res.status(200).json(rows);
+    // Des-escapar las descripciones antes de enviar la respuesta
+    const desescapedRows = rows.map(row => ({
+      ...row,
+      descripcion: unescape(row.descripcion),
+    }));
+
+    res.status(200).json(desescapedRows);
   });
 });
 
-// Endpoint para buscar un ticket (tarea) por numero_tarea
 app.get('/tareas/:numero_tarea', (req, res) => {
   const { numero_tarea } = req.params;
 
-  const query = `SELECT 1 FROM tareas WHERE numero_tarea = ?`;
+  const query = `SELECT * FROM tareas WHERE numero_tarea = ?`;
   db.get(query, [numero_tarea], (err, row) => {
     if (err) {
-      return res.status(500).json({ error: 'Error al buscar el ticket' });
+      return res.status(500).json({ error: 'Error al buscar la tarea' });
     }
 
-    // Si la tarea existe, devolver true; de lo contrario, false
-    res.status(200).json({ exists: !!row });
+    if (!row) {
+      return res.status(404).json({ error: 'Tarea no encontrada' });
+    }
+
+    // Des-escapar la descripción antes de enviar la respuesta
+    row.descripcion = unescape(row.descripcion);
+
+    res.status(200).json(row);
   });
 });
 
