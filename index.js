@@ -43,7 +43,7 @@ app.post('/tareas', (req, res) => {
   const query = `INSERT INTO tareas (descripcion, conversationID) VALUES (?, ?)`;
   db.run(query, [descripcion, conversationID], function (err) {
     if (err) {
-      console.error(`Fallo al crear la tarea: ${JSON.stringify(err,null,2)}`);
+      console.error(`Fallo al crear la tarea: ${JSON.stringify(err, null, 2)}`);
       return res.status(500).json({ error: 'Error al crear la tarea' });
     }
 
@@ -64,7 +64,7 @@ app.put('/tareas/:numero_tarea', (req, res) => {
   const query = `UPDATE tareas SET descripcion = ? WHERE numero_tarea = ?`;
   db.run(query, [descripcion, numero_tarea], function (err) {
     if (err) {
-      console.error(`Fallo al crear la tarea: ${JSON.stringify(err,null,2)}`);
+      console.error(`Fallo al crear la tarea: ${JSON.stringify(err, null, 2)}`);
       return res.status(500).json({ error: 'Error al actualizar la tarea' });
     }
 
@@ -76,6 +76,7 @@ app.put('/tareas/:numero_tarea', (req, res) => {
   });
 });
 
+// Endpoint para listar todas las tareas (GET)
 app.get('/tareas', (req, res) => {
   const query = `SELECT * FROM tareas`;
   db.all(query, [], (err, rows) => {
@@ -83,16 +84,17 @@ app.get('/tareas', (req, res) => {
       return res.status(500).json({ error: 'Error al obtener las tareas' });
     }
 
-    // Des-escapar las descripciones antes de enviar la respuesta
-    const desescapedRows = rows.map(row => ({
+    // Renderizar las descripciones como HTML
+    const renderedRows = rows.map(row => ({
       ...row,
-      descripcion: unescape(row.descripcion),
+      descripcion: `<div>${unescape(row.descripcion)}</div>`,
     }));
 
-    res.status(200).json(desescapedRows);
+    res.status(200).json(renderedRows);
   });
 });
 
+// Endpoint para buscar una tarea por numero_tarea (GET)
 app.get('/tareas/:numero_tarea', (req, res) => {
   const { numero_tarea } = req.params;
 
@@ -106,13 +108,12 @@ app.get('/tareas/:numero_tarea', (req, res) => {
       return res.status(404).json({ error: 'Tarea no encontrada' });
     }
 
-    // Des-escapar la descripción antes de enviar la respuesta
-    row.descripcion = unescape(row.descripcion);
+    // Renderizar la descripción como HTML
+    row.descripcion = `<div>${unescape(row.descripcion)}</div>`;
 
     res.status(200).json(row);
   });
 });
-
 
 // Iniciar el servidor
 app.listen(port, () => {
